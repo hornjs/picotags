@@ -1,0 +1,49 @@
+{
+  "name": "picotags",
+  "type": "module",
+  "version": "0.0.0",
+  "description": "Tiny XML-like tag tokenizer and transformer for inline markup.",
+  "author": "Maofeng <hornjs@qq.com>",
+  "license": "MIT",
+  "homepage": "https://github.com/hornjs/picotags#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hornjs/picotags.git"
+  },
+  "bugs": {
+    "url": "https://github.com/hornjs/picotags/issues"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "directories": {
+      "src": "dist"
+    }
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "preinstall": "npx only-allow pnpm",
+    "build": "tsdown",
+    "dev": "tsdown --watch",
+    "test": "node --experimental-strip-types --test \"src/*.test.ts\"",
+    "typecheck": "tsc --noEmit",
+    "release": "bumpp",
+    "prepare:publish": "prepare-publish --print-tree",
+    "prepare:publish:dry-run": "prepare-publish --dry-run",
+    "prepublishOnly": "pnpm run build && pnpm run prepare:publish"
+  },
+  "devDependencies": {
+    "@types/node": "^25.5.0",
+    "prepare-publish": "^0.1.0",
+    "bumpp": "^11.0.1",
+    "tsdown": "^0.21.7",
+    "typescript": "^6.0.2"
+  }
+}
