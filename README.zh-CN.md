@@ -1,24 +1,22 @@
 # picotags
 
-Small XML-like tag tokenizer and transformer for inline markup.
+用于内联标记的轻量 XML-like 标签 tokenizer 和 transformer。
 
-Use `picotags` when you want lightweight tags inside strings, such as
-`<red>failed</red>` for terminal colors, `<dim>hint</dim>` for CLI output, or
-custom inline markers in logs, messages, and rich-text pipelines. It parses the
-tag structure and leaves the rendering or replacement rules to your code.
+当你想在字符串里使用轻量标签时，可以使用 `picotags`，例如终端颜色里的
+`<red>failed</red>`、CLI 输出里的 `<dim>hint</dim>`，或者日志、消息和富文本管线里的自定义内联标记。它负责解析标签结构，具体如何渲染或替换由你的代码决定。
 
-## Features
+## 特性
 
-- Tiny, dependency-free runtime.
-- Streaming-friendly `tokenize()` iterator.
-- Opening, closing, text, and self-closing tokens.
-- Boolean, quoted, and bare attributes.
-- Token `start` / `end` source offsets.
-- Strict nesting validation for recognized tags.
-- `transform()` output chunks that are ready to feed into source map tooling.
-- Malformed `<` characters are preserved as text instead of throwing.
+- 运行时很小，无依赖。
+- `tokenize()` 返回可流式消费的 iterator。
+- 支持开始标签、结束标签、文本和自闭合标签。
+- 支持 boolean、双引号、单引号和裸值属性。
+- token 包含 `start` / `end` 源码位置。
+- 对已识别标签做严格嵌套校验。
+- `transform()` 返回可接入 source map 工具的输出片段。
+- 不合法的 `<` 会保留为文本，不会抛错。
 
-## Install
+## 安装
 
 ```sh
 pnpm add picotags
@@ -30,7 +28,7 @@ import { replace, tokenize, transform } from "picotags";
 
 ## Tokenize
 
-`tokenize(input)` returns an iterator, so you can consume tokens with `for...of` or `Array.from()`.
+`tokenize(input)` 返回一个 iterator，可以用 `for...of` 或 `Array.from()` 消费。
 
 ```ts
 import { tokenize } from "picotags";
@@ -40,7 +38,7 @@ const tokens = Array.from(tokenize('a <dim level=1 flag>b<br /></dim>'));
 console.log(tokens);
 ```
 
-Output:
+输出：
 
 ```ts
 [
@@ -59,13 +57,11 @@ Output:
 ]
 ```
 
-Recognized tags must be properly nested and closed. Invalid structure throws
-`PicotagsSyntaxError`.
+已识别的标签必须正确嵌套并关闭。结构不合法时会抛出 `PicotagsSyntaxError`。
 
-## Syntax Errors
+## 语法错误
 
-`tokenize()`, `replace()`, and `transform()` throw
-`PicotagsSyntaxError` when recognized tags are not structurally valid.
+`tokenize()`、`replace()` 和 `transform()` 在遇到不合法标签结构时会抛出 `PicotagsSyntaxError`。
 
 ```ts
 import { PicotagsSyntaxError, tokenize } from "picotags";
@@ -80,7 +76,7 @@ try {
 }
 ```
 
-Error codes:
+错误码：
 
 ```ts
 type SyntaxErrorCode =
@@ -91,9 +87,9 @@ type SyntaxErrorCode =
 
 ## Replace
 
-`replace(input, handlers)` replaces tokens from left to right.
+`replace(input, handlers)` 按源码顺序替换 token。
 
-If a handler returns a string, that string is used. If it returns `undefined`, the original token text is preserved.
+handler 返回字符串时，会用返回值替换当前 token。返回 `undefined` 时，会保留当前 token 的原始文本。
 
 ```ts
 import { replace } from "picotags";
@@ -114,7 +110,7 @@ console.log(output);
 // [dim]Hello [br/][/dim]
 ```
 
-Text can be replaced too:
+文本也可以替换：
 
 ```ts
 replace("<dim>Hello</dim>", {
@@ -127,10 +123,9 @@ replace("<dim>Hello</dim>", {
 
 ## Transform
 
-`transform(input, handlers)` applies the same replacement callbacks as
-`replace()`, but also returns source range chunks.
+`transform(input, handlers)` 使用和 `replace()` 相同的替换回调，但额外返回源码位置片段。
 
-It returns generated code plus chunk mappings:
+它返回生成后的代码和 chunk 映射信息：
 
 ```ts
 import { transform } from "picotags";
@@ -153,7 +148,7 @@ console.log(result.code);
 console.log(result.chunks);
 ```
 
-Each chunk includes original and generated ranges:
+每个 chunk 都包含原始范围和生成范围：
 
 ```ts
 type TransformChunk = {
@@ -167,11 +162,11 @@ type TransformChunk = {
 };
 ```
 
-This is not a source map implementation by itself. It gives you the raw range data needed to connect to a source map library later.
+这不是 source map 实现。它只提供后续接入 source map 库所需的原始范围数据。
 
-## Attributes
+## 属性
 
-Supported attribute forms:
+支持的属性形式：
 
 ```txt
 <tag disabled>
@@ -180,7 +175,7 @@ Supported attribute forms:
 <tag count=1>
 ```
 
-Parsed result:
+解析结果：
 
 ```ts
 {
@@ -189,9 +184,9 @@ Parsed result:
 }
 ```
 
-Attribute values are always strings unless the attribute is boolean.
+属性值始终是字符串；没有显式值的 boolean 属性为 `true`。
 
-## Token Types
+## Token 类型
 
 ```ts
 type Token =
@@ -201,7 +196,7 @@ type Token =
   | CloseTagToken;
 ```
 
-Text token:
+文本 token：
 
 ```ts
 type TextToken = {
@@ -212,7 +207,7 @@ type TextToken = {
 };
 ```
 
-Opening tag:
+开始标签：
 
 ```ts
 type OpenTagToken = {
@@ -225,7 +220,7 @@ type OpenTagToken = {
 };
 ```
 
-Self-closing tag:
+自闭合标签：
 
 ```ts
 type SelfCloseTagToken = {
@@ -238,7 +233,7 @@ type SelfCloseTagToken = {
 };
 ```
 
-Closing tag:
+结束标签：
 
 ```ts
 type CloseTagToken = {
@@ -250,22 +245,22 @@ type CloseTagToken = {
 };
 ```
 
-## Grammar
+## 语法
 
-Tag and attribute names must match:
+标签名和属性名必须匹配：
 
 ```txt
 [A-Za-z][A-Za-z0-9:_-]*
 ```
 
-Examples:
+示例：
 
 ```txt
 <dim>
 <x-foo:bar_1>
 ```
 
-Malformed tags are kept as text:
+不合法标签会保留为文本：
 
 ```ts
 Array.from(tokenize("a < b"));
