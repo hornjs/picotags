@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { ATTR, CLOSE_TAG, NAME, OPEN_TAG, parseAttrs } from "./utils.ts";
+import { ATTR, CLOSE_TAG, getReplacement, getTokenSource, NAME, OPEN_TAG, parseAttrs } from "./utils.ts";
 
 test("NAME matches supported tag and attribute names", () => {
   const pattern = new RegExp(`^${NAME}$`);
@@ -38,4 +38,28 @@ test("parseAttrs returns normalized attributes", () => {
     b: "2",
     c: "three",
   });
+});
+
+test("getTokenSource returns text or raw token source", () => {
+  assert.equal(getTokenSource({ type: "text", text: "hello", start: 0, end: 5 }), "hello");
+  assert.equal(getTokenSource({ type: "opentag", name: "a", attrs: {}, raw: "<a>", start: 0, end: 3 }), "<a>");
+  assert.equal(getTokenSource({ type: "selfclosetag", name: "br", attrs: {}, raw: "<br />", start: 0, end: 6 }), "<br />");
+  assert.equal(getTokenSource({ type: "closetag", name: "a", raw: "</a>", start: 0, end: 4 }), "</a>");
+});
+
+test("getReplacement applies callbacks and falls back to source", () => {
+  assert.equal(
+    getReplacement(
+      { type: "opentag", name: "a", attrs: {}, raw: "<a>", start: 0, end: 3 },
+      { onopentag: (token) => `[${token.name}]` },
+    ),
+    "[a]",
+  );
+  assert.equal(
+    getReplacement(
+      { type: "text", text: "hello", start: 0, end: 5 },
+      { ontext: () => undefined },
+    ),
+    "hello",
+  );
 });

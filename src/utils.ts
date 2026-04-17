@@ -1,4 +1,4 @@
-import type { TagAttrs } from "./index.ts";
+import type { Options, TagAttrs, Token } from "./types.ts";
 
 /**
  * Supported tag and attribute name pattern.
@@ -55,4 +55,27 @@ export function parseAttrs(input: string): TagAttrs {
   }
 
   return attrs;
+}
+
+/**
+ * Return the exact source text represented by a token.
+ */
+export function getTokenSource(token: Token): string {
+  return token.type === "text" ? token.text : token.raw;
+}
+
+/**
+ * Apply a replacement callback to a token, falling back to its source text.
+ */
+export function getReplacement(token: Token, options: Options): string {
+  switch (token.type) {
+    case "opentag":
+      return options.onopentag?.(token) ?? token.raw;
+    case "selfclosetag":
+      return options.onselfclosetag?.(token) ?? token.raw;
+    case "closetag":
+      return options.onclosetag?.(token) ?? token.raw;
+    case "text":
+      return options.ontext?.(token) ?? token.text;
+  }
 }
