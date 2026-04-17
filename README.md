@@ -1,5 +1,7 @@
 # picotags
 
+[中文](README.zh-CN.md)
+
 Small XML-like tag tokenizer and transformer for inline markup.
 
 Use `picotags` when you want lightweight tags inside strings, such as

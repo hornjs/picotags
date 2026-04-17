@@ -1,5 +1,7 @@
 # picotags
 
+[English](README.md)
+
 用于内联标记的轻量 XML-like 标签 tokenizer 和 transformer。
 
 当你想在字符串里使用轻量标签时，可以使用 `picotags`，例如终端颜色里的
