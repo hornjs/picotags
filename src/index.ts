@@ -4,6 +4,7 @@ export { replace } from "./replace.ts";
 export { tokenize } from "./tokenize.ts";
 export { transform } from "./transform.ts";
 export type {
+  AttrToken,
   CloseTagToken,
   OpenTagToken,
   Options,

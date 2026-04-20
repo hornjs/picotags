@@ -1,14 +1,4 @@
 /**
- * Attribute map parsed from an opening or self-closing tag.
- *
- * Attributes without an explicit value are represented as `true`.
- *
- * @example
- * `<tag disabled count="1">` -> `{ disabled: true, count: "1" }`
- */
-export type TagAttrs = Record<string, string | true>;
-
-/**
  * Source range for a token.
  *
  * `start` is inclusive and `end` is exclusive. Both offsets are UTF-16 string
@@ -18,6 +8,25 @@ export type SourceSpan = {
   start: number;
   end: number;
 };
+
+/**
+ * One attribute parsed from an opening or self-closing tag.
+ *
+ * Attributes without an explicit value are represented as `true`.
+ */
+export type AttrToken = SourceSpan & {
+  name: string;
+  value: string | true;
+  /** Original source slice for this attribute. */
+  raw: string;
+};
+
+/**
+ * Attribute list parsed from an opening or self-closing tag.
+ *
+ * Attributes preserve source order and per-attribute source positions.
+ */
+export type TagAttrs = AttrToken[];
 
 /**
  * Plain text between tags.

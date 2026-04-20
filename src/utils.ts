@@ -1,4 +1,4 @@
-import type { Options, TagAttrs, Token } from "./types.ts";
+import type { AttrToken, Options, TagAttrs, Token } from "./types.ts";
 
 /**
  * Supported tag and attribute name pattern.
@@ -38,20 +38,28 @@ export const CLOSE_TAG = new RegExp(`^</(${NAME})>`);
 export const ATTR = /([A-Za-z][A-Za-z0-9:_-]*)(?:\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'=<>`]+)))?/g;
 
 /**
- * Parse a raw tag attribute body into a normalized attribute map.
+ * Parse a raw tag attribute body into attribute tokens.
  *
  * Boolean attributes are represented as `true`. Quoted and bare values are
  * returned without their surrounding quotes.
  */
-export function parseAttrs(input: string): TagAttrs {
-  const attrs: TagAttrs = {};
+export function parseAttrs(input: string, offset = 0): TagAttrs {
+  const attrs: AttrToken[] = [];
   // ATTR is global, so reset it before each independent parse.
   ATTR.lastIndex = 0;
 
   let match: RegExpExecArray | null;
   while ((match = ATTR.exec(input))) {
     const [, name, doubleQuoted, singleQuoted, bare] = match;
-    attrs[name] = doubleQuoted ?? singleQuoted ?? bare ?? true;
+    const value = doubleQuoted ?? singleQuoted ?? bare ?? true;
+    const start = offset + match.index;
+    attrs.push({
+      name,
+      value,
+      raw: match[0],
+      start,
+      end: start + match[0].length,
+    });
   }
 
   return attrs;

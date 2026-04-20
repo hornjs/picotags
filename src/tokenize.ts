@@ -85,7 +85,8 @@ export function* tokenize(input: string): IterableIterator<Token> {
       }
       const attrsSource = open[2];
       const selfClosing = attrsSource.trimEnd().endsWith("/");
-      const attrs = parseAttrs(selfClosing ? attrsSource.trimEnd().slice(0, -1) : attrsSource);
+      const normalizedAttrsSource = selfClosing ? attrsSource.trimEnd().slice(0, -1) : attrsSource;
+      const attrs = parseAttrs(normalizedAttrsSource, next + 1 + open[1].length);
       const token: OpenTagToken | SelfCloseTagToken = {
         type: selfClosing ? "selfclosetag" : "opentag",
         name: open[1],
