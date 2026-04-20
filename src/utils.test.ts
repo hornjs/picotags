@@ -31,26 +31,26 @@ test("ATTR tokenizes boolean, quoted, and bare attributes", () => {
   ]);
 });
 
-test("parseAttrs returns normalized attributes", () => {
-  assert.deepEqual(parseAttrs(' disabled a="1" b=\'2\' c=three'), {
-    disabled: true,
-    a: "1",
-    b: "2",
-    c: "three",
-  });
+test("parseAttrs returns ordered attribute tokens with source spans", () => {
+  assert.deepEqual(parseAttrs(' disabled a="1" b=\'2\' c=three', 4), [
+    { name: "disabled", value: true, raw: "disabled", start: 5, end: 13 },
+    { name: "a", value: "1", raw: 'a="1"', start: 14, end: 19 },
+    { name: "b", value: "2", raw: "b='2'", start: 20, end: 25 },
+    { name: "c", value: "three", raw: "c=three", start: 26, end: 33 },
+  ]);
 });
 
 test("getTokenSource returns text or raw token source", () => {
   assert.equal(getTokenSource({ type: "text", text: "hello", start: 0, end: 5 }), "hello");
-  assert.equal(getTokenSource({ type: "opentag", name: "a", attrs: {}, raw: "<a>", start: 0, end: 3 }), "<a>");
-  assert.equal(getTokenSource({ type: "selfclosetag", name: "br", attrs: {}, raw: "<br />", start: 0, end: 6 }), "<br />");
+  assert.equal(getTokenSource({ type: "opentag", name: "a", attrs: [], raw: "<a>", start: 0, end: 3 }), "<a>");
+  assert.equal(getTokenSource({ type: "selfclosetag", name: "br", attrs: [], raw: "<br />", start: 0, end: 6 }), "<br />");
   assert.equal(getTokenSource({ type: "closetag", name: "a", raw: "</a>", start: 0, end: 4 }), "</a>");
 });
 
 test("getReplacement applies callbacks and falls back to source", () => {
   assert.equal(
     getReplacement(
-      { type: "opentag", name: "a", attrs: {}, raw: "<a>", start: 0, end: 3 },
+      { type: "opentag", name: "a", attrs: [], raw: "<a>", start: 0, end: 3 },
       { onopentag: (token) => `[${token.name}]` },
     ),
     "[a]",

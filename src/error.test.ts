@@ -7,7 +7,7 @@ function openTag(name: string): OpenTagToken {
   return {
     type: "opentag",
     name,
-    attrs: {},
+    attrs: [],
     raw: `<${name}>`,
     start: 0,
     end: name.length + 2,

@@ -24,9 +24,19 @@ function expectSyntaxError(
 test("tokenize parses text, nested tags, attrs, and self-closing tags", () => {
   assert.deepEqual(Array.from(tokenize('a <dim level=1 flag>b<br /></dim>')), [
     { type: "text", text: "a ", start: 0, end: 2 },
-    { type: "opentag", name: "dim", attrs: { level: "1", flag: true }, raw: "<dim level=1 flag>", start: 2, end: 20 },
+    {
+      type: "opentag",
+      name: "dim",
+      attrs: [
+        { name: "level", value: "1", raw: "level=1", start: 7, end: 14 },
+        { name: "flag", value: true, raw: "flag", start: 15, end: 19 },
+      ],
+      raw: "<dim level=1 flag>",
+      start: 2,
+      end: 20,
+    },
     { type: "text", text: "b", start: 20, end: 21 },
-    { type: "selfclosetag", name: "br", attrs: {}, raw: "<br />", start: 21, end: 27 },
+    { type: "selfclosetag", name: "br", attrs: [], raw: "<br />", start: 21, end: 27 },
     { type: "closetag", name: "dim", raw: "</dim>", start: 27, end: 33 },
   ]);
 });
@@ -52,9 +62,9 @@ test("tokenize can be consumed in source order", () => {
   }
 
   assert.deepEqual(events, [
-    ["open", "dim", {}, 0, 5],
+    ["open", "dim", [], 0, 5],
     ["text", "Hello", 5, 10],
-    ["self", "br", {}, 10, 16],
+    ["self", "br", [], 10, 16],
     ["close", "dim", 16, 22],
   ]);
 });
