@@ -48,13 +48,16 @@ console.log(tokens);
   {
     type: "opentag",
     name: "dim",
-    attrs: { level: "1", flag: true },
+    attrs: [
+      { name: "level", value: "1", raw: "level=1", start: 7, end: 14 },
+      { name: "flag", value: true, raw: "flag", start: 15, end: 19 },
+    ],
     raw: "<dim level=1 flag>",
     start: 2,
     end: 20,
   },
   { type: "text", text: "b", start: 20, end: 21 },
-  { type: "selfclosetag", name: "br", attrs: {}, raw: "<br />", start: 21, end: 27 },
+  { type: "selfclosetag", name: "br", attrs: [], raw: "<br />", start: 21, end: 27 },
   { type: "closetag", name: "dim", raw: "</dim>", start: 27, end: 33 },
 ]
 ```
@@ -180,11 +183,13 @@ type TransformChunk = {
 解析结果：
 
 ```ts
-{
-  disabled: true,
-  count: "1"
-}
+[
+  { name: "disabled", value: true, raw: "disabled", start: 1, end: 9 },
+  { name: "count", value: "1", raw: 'count="1"', start: 10, end: 19 },
+]
 ```
+
+属性会保留源码顺序。每个属性都带自己的 `raw`、`start` 和 `end`，便于保留精确位置信息。
 
 属性值始终是字符串；没有显式值的 boolean 属性为 `true`。
 
@@ -215,7 +220,7 @@ type TextToken = {
 type OpenTagToken = {
   type: "opentag";
   name: string;
-  attrs: Record<string, string | true>;
+  attrs: AttrToken[];
   raw: string;
   start: number;
   end: number;
@@ -228,7 +233,19 @@ type OpenTagToken = {
 type SelfCloseTagToken = {
   type: "selfclosetag";
   name: string;
-  attrs: Record<string, string | true>;
+  attrs: AttrToken[];
+  raw: string;
+  start: number;
+  end: number;
+};
+```
+
+属性 token：
+
+```ts
+type AttrToken = {
+  name: string;
+  value: string | true;
   raw: string;
   start: number;
   end: number;

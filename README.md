@@ -50,13 +50,16 @@ Output:
   {
     type: "opentag",
     name: "dim",
-    attrs: { level: "1", flag: true },
+    attrs: [
+      { name: "level", value: "1", raw: "level=1", start: 7, end: 14 },
+      { name: "flag", value: true, raw: "flag", start: 15, end: 19 },
+    ],
     raw: "<dim level=1 flag>",
     start: 2,
     end: 20,
   },
   { type: "text", text: "b", start: 20, end: 21 },
-  { type: "selfclosetag", name: "br", attrs: {}, raw: "<br />", start: 21, end: 27 },
+  { type: "selfclosetag", name: "br", attrs: [], raw: "<br />", start: 21, end: 27 },
   { type: "closetag", name: "dim", raw: "</dim>", start: 27, end: 33 },
 ]
 ```
@@ -185,11 +188,14 @@ Supported attribute forms:
 Parsed result:
 
 ```ts
-{
-  disabled: true,
-  count: "1"
-}
+[
+  { name: "disabled", value: true, raw: "disabled", start: 1, end: 9 },
+  { name: "count", value: "1", raw: 'count="1"', start: 10, end: 19 },
+]
 ```
+
+Attributes preserve source order. Each attribute has its own `raw`, `start`, and
+`end`, so consumers can keep exact source locations.
 
 Attribute values are always strings unless the attribute is boolean.
 
@@ -220,7 +226,7 @@ Opening tag:
 type OpenTagToken = {
   type: "opentag";
   name: string;
-  attrs: Record<string, string | true>;
+  attrs: AttrToken[];
   raw: string;
   start: number;
   end: number;
@@ -233,7 +239,19 @@ Self-closing tag:
 type SelfCloseTagToken = {
   type: "selfclosetag";
   name: string;
-  attrs: Record<string, string | true>;
+  attrs: AttrToken[];
+  raw: string;
+  start: number;
+  end: number;
+};
+```
+
+Attribute token:
+
+```ts
+type AttrToken = {
+  name: string;
+  value: string | true;
   raw: string;
   start: number;
   end: number;
