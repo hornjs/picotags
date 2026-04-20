@@ -1,7 +1,7 @@
 {
   "name": "picotags",
   "type": "module",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Tiny XML-like tag tokenizer and transformer for inline markup.",
   "author": "Maofeng <hornjs@qq.com>",
   "license": "MIT",
